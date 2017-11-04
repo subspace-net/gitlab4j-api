@@ -801,6 +801,32 @@ public class ProjectApi extends AbstractApi implements Constants {
     }
 
     /**
+     * Forks a project into the provided namespace
+     *
+     * POST /projects/:id/fork
+     *
+     * @param projectId the project ID to fork
+     * @param namespace the namespace for the new fork
+     * @throws GitLabApiException if any exception occurs
+     */
+    public void forkProject(Integer projectId, String namespace) throws GitLabApiException {
+
+        if (namespace == null || namespace.trim().length() == 0) {
+            throw new RuntimeException("Namespace cannot be null or empty.");
+        }
+
+        GitLabApiForm formData = new GitLabApiForm()
+            .withParam("namespace", namespace);
+
+        if (projectId == null) {
+            throw new RuntimeException("projectId cannot be null");
+        }
+
+        Response.Status expectedStatus = (isApiVersion(ApiVersion.V3) ? Response.Status.OK : Response.Status.ACCEPTED);
+        put(expectedStatus, formData.asMap(), "projects", projectId, "fork");
+    }
+
+    /**
      * Removes project with all resources(issues, merge requests etc).
      *
      * DELETE /projects/:id
